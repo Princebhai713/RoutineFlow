@@ -3,6 +3,12 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
+function postMessageToServiceWorker(message: any) {
+  if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+    navigator.serviceWorker.controller.postMessage(message);
+  }
+}
+
 export function useNotifications() {
   const [permission, setPermission] = useState<NotificationPermission>('default');
 
@@ -30,19 +36,20 @@ export function useNotifications() {
   }, []);
 
   const showNotification = useCallback((title: string, options?: NotificationOptions) => {
-    if (!('Notification' in window)) {
+    if (!('Notification' in window) || Notification.permission !== 'granted') {
       return;
     }
-    if (Notification.permission === 'granted') {
-      const notification = new Notification(title, {
-        ...options,
-        icon: '/logo.png', // It's good practice to have an icon
-      });
 
-      notification.onclick = () => {
-        window.focus();
-      };
-    }
+    postMessageToServiceWorker({
+      type: 'show-notification',
+      payload: {
+        title,
+        options: {
+          ...options,
+          icon: '/logo.png',
+        },
+      }
+    });
   }, []);
 
   const scheduleNotification = useCallback((title: string, scheduleTime: Date, options?: NotificationOptions): number | undefined => {
