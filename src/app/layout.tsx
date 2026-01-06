@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 export const metadata: Metadata = {
   title: 'RoutineFlow',
   description: 'A smart daily routine planner to optimize your day.',
+  manifest: '/manifest.json',
 };
 
 export default function RootLayout({
@@ -18,6 +19,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
+        <meta name="theme-color" content="#3B82F6" />
       </head>
       <body className="font-body antialiased">
         {children}
