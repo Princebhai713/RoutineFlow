@@ -61,14 +61,17 @@ export function AddRoutineSheet({ isOpen, onOpenChange, onAddRoutine, routineToE
     onOpenChange(false);
   }
 
+  const sheetTitle = routineToEdit ? "Edit Routine" : "Add New Routine";
+  const sheetDescription = routineToEdit 
+    ? "Update the details of your routine and save the changes." 
+    : "Fill in the details for a new routine to add to your schedule.";
+
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>{routineToEdit ? "Edit Routine" : "Add New Routine"}</SheetTitle>
-          <SheetDescription>
-            {routineToEdit ? "Update the details of your routine." : "Fill in the details of your new routine."}
-          </SheetDescription>
+          <SheetTitle>{sheetTitle}</SheetTitle>
+          <SheetDescription>{sheetDescription}</SheetDescription>
         </SheetHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 py-6">

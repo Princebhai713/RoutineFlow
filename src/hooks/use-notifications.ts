@@ -9,6 +9,10 @@ function postMessageToServiceWorker(message: any) {
   }
 }
 
+// A simple way to generate unique IDs for notifications
+const generateId = () => Math.floor(Math.random() * 1000000);
+
+
 export function useNotifications() {
   const [permission, setPermission] = useState<NotificationPermission>('default');
 
@@ -54,26 +58,39 @@ export function useNotifications() {
 
   const scheduleNotification = useCallback((title: string, scheduleTime: Date, options?: NotificationOptions): number | undefined => {
     if (permission !== 'granted') {
-      return undefined;
+        console.log('Notification permission not granted.');
+        return undefined;
     }
 
-    const now = new Date().getTime();
-    const timeUntilNotification = scheduleTime.getTime() - now;
+    const notificationId = generateId();
+    const time = scheduleTime.getTime();
 
-    if (timeUntilNotification < 0) {
-      console.log("Cannot schedule notification for a past time.");
-      return undefined;
+    if (time < Date.now()) {
+        console.log('Cannot schedule notification for a past time.');
+        return undefined;
     }
+    
+    postMessageToServiceWorker({
+        type: 'schedule-notification',
+        payload: {
+            id: notificationId,
+            title,
+            options: {
+                ...options,
+                icon: '/logo.png',
+            },
+            time,
+        },
+    });
 
-    const timeoutId = window.setTimeout(() => {
-      showNotification(title, options);
-    }, timeUntilNotification);
+    return notificationId;
+  }, [permission]);
 
-    return timeoutId;
-  }, [permission, showNotification]);
-
-  const cancelNotification = useCallback((timeoutId: number) => {
-    window.clearTimeout(timeoutId);
+  const cancelNotification = useCallback((notificationId: number) => {
+    postMessageToServiceWorker({
+        type: 'cancel-notification',
+        payload: { id: notificationId },
+    });
   }, []);
 
 
