@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Slider } from "@/components/ui/slider";
 import type { Routine } from "@/lib/types";
 import { calculateHours } from "@/lib/utils";
 
@@ -20,6 +21,7 @@ const routineSchema = z.object({
   endTime: z.string().min(1, { message: "End time is required." }),
   work: z.string().min(1, { message: "Work/Subject is required." }),
   completed: z.boolean().default(false),
+  score: z.number().min(0).max(10).default(0),
 }).refine(data => data.endTime > data.startTime, {
   message: "End time must be after start time.",
   path: ["endTime"],
@@ -44,12 +46,16 @@ export function AddRoutineSheet({ isOpen, onOpenChange, onAddRoutine, routineToE
       endTime: "",
       work: "",
       completed: false,
+      score: 0,
     },
   });
 
   useEffect(() => {
     if (routineToEdit) {
-      form.reset(routineToEdit);
+      form.reset({
+        ...routineToEdit,
+        score: routineToEdit.score ?? 0,
+      });
     } else {
       form.reset({
         attempt: "",
@@ -57,13 +63,14 @@ export function AddRoutineSheet({ isOpen, onOpenChange, onAddRoutine, routineToE
         endTime: "",
         work: "",
         completed: false,
+        score: 0,
       });
     }
   }, [routineToEdit, form, isOpen]);
 
   function onSubmit(data: RoutineFormValues) {
     const hours = calculateHours(data.startTime, data.endTime);
-    onAddRoutine({ ...data, hours });
+    onAddRoutine({ ...data, hours, score: data.score });
     onOpenChange(false);
   }
 
@@ -139,6 +146,25 @@ export function AddRoutineSheet({ isOpen, onOpenChange, onAddRoutine, routineToE
                   <FormLabel>Work / Subject</FormLabel>
                   <FormControl>
                     <Input placeholder="e.g., Study Physics" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="score"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Score ({field.value})</FormLabel>
+                  <FormControl>
+                    <Slider
+                      min={0}
+                      max={10}
+                      step={1}
+                      value={[field.value]}
+                      onValueChange={(value) => field.onChange(value[0])}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

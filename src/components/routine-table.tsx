@@ -50,6 +50,7 @@ export function RoutineTable({ routines, onToggleComplete, onDeleteRoutine, onEd
                 <TableHead>Time</TableHead>
                 <TableHead>Work</TableHead>
                 <TableHead className="text-right">Hours</TableHead>
+                <TableHead className="text-right">Score</TableHead>
                 <TableHead className="text-center w-[100px]">Status</TableHead>
                 <TableHead className="text-right w-[50px]">Actions</TableHead>
               </TableRow>
@@ -61,6 +62,7 @@ export function RoutineTable({ routines, onToggleComplete, onDeleteRoutine, onEd
                   <TableCell>{formatTime(routine.startTime)} - {formatTime(routine.endTime)}</TableCell>
                   <TableCell className="font-medium">{routine.work}</TableCell>
                   <TableCell className="text-right">{routine.hours}</TableCell>
+                  <TableCell className="text-right">{routine.score ?? 'N/A'}</TableCell>
                   <TableCell className="text-center">
                     <Checkbox
                       checked={routine.completed}
@@ -98,7 +100,7 @@ export function RoutineTable({ routines, onToggleComplete, onDeleteRoutine, onEd
               <TableRow>
                 <TableCell colSpan={3} className="font-bold">Total Hours</TableCell>
                 <TableCell className="text-right font-bold">{totalHours.toFixed(2)}</TableCell>
-                <TableCell colSpan={2}></TableCell>
+                <TableCell colSpan={3}></TableCell>
               </TableRow>
             </TableFooter>
           </Table>
