@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { BrainCircuit, Bell, BellOff } from 'lucide-react'
+git add .
 import type { Routine } from '@/lib/types';
 import { SmartScheduler } from './smart-scheduler';
 import { Button } from '@/components/ui/button';
