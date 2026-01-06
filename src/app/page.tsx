@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Plus } from "lucide-react";
+import { Plus, TestTube2 } from "lucide-react";
 import { AppHeader } from "@/components/app-header";
 import { AddRoutineSheet } from "@/components/add-routine-sheet";
 import { RoutineTable } from "@/components/routine-table";
@@ -19,7 +19,7 @@ export default function Home() {
   const [isMounted, setIsMounted] = useState(false);
   const [editingRoutine, setEditingRoutine] = useState<Routine | null>(null);
   const { toast } = useToast();
-  const { scheduleNotification, cancelNotification, permission } = useNotifications();
+  const { scheduleNotification, cancelNotification, permission, showNotification } = useNotifications();
 
   useEffect(() => {
     setIsMounted(true);
@@ -141,6 +141,25 @@ export default function Home() {
     }
   };
 
+  const sendDemoNotification = () => {
+    if (permission !== 'granted') {
+      toast({
+        variant: "destructive",
+        title: "Notifications not enabled",
+        description: "Please enable notifications to send a demo.",
+      });
+      return;
+    }
+    showNotification("Demo Routine: Sleep", {
+      body: "Time: 12:00, Hours: 10, Attempt: First",
+    });
+     toast({
+      title: "Demo Notification Sent",
+      description: "Check your system notifications.",
+    });
+  };
+
+
   if (!isMounted) {
     return null;
   }
@@ -158,6 +177,15 @@ export default function Home() {
           />
         </div>
       </main>
+       <Button
+        className="fixed bottom-6 left-6 h-14 w-14 rounded-full shadow-lg z-50"
+        size="icon"
+        variant="secondary"
+        onClick={sendDemoNotification}
+        aria-label="Send demo notification"
+      >
+        <TestTube2 className="h-6 w-6" />
+      </Button>
       <Button
         className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg z-50"
         size="icon"
