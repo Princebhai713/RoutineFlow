@@ -1,102 +1,85 @@
-// public/sw.js
 
-// A map to store active timers for scheduled notifications
-const scheduledNotifications = new Map();
+const CACHE_NAME = 'routineflow-cache-v1';
+const urlsToCache = [
+  '/',
+  '/manifest.json',
+  '/logo.svg',
+  '/silent.mp3'
+];
 
-self.addEventListener('install', (event) => {
-  self.skipWaiting();
-});
-
-self.addEventListener('activate', (event) => {
-  event.waitUntil(self.clients.claim());
-});
-
-self.addEventListener('message', (event) => {
-  const { type, payload } = event.data;
-
-  if (type === 'show-notification') {
-    const { title, options } = payload;
-    event.waitUntil(
-      self.registration.showNotification(title, {
-        ...options,
-        // Ensure sound is requested
-        sound: options.sound || '/silent.mp3', // A silent file can be used if no custom sound, but most browsers play a default sound.
-        vibrate: [200, 100, 200], // Add vibration for mobile devices
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => {
+        console.log('Opened cache');
+        return cache.addAll(urlsToCache);
       })
-    );
-  } else if (type === 'schedule-notification') {
-    const { id, title, options, time } = payload;
-    const delay = time - Date.now();
+  );
+});
 
+self.addEventListener('message', event => {
+  if (event.data.type === 'show-notification') {
+    const { title, options } = event.data.payload;
+    event.waitUntil(self.registration.showNotification(title, {
+      ...options,
+      actions: [
+        { action: 'snooze', title: 'Snooze 5 mins' },
+        { action: 'dismiss', title: 'Dismiss' }
+      ]
+    }));
+  } else if (event.data.type === 'schedule-notification') {
+    const { id, title, options, time } = event.data.payload;
+    const delay = time - Date.now();
     if (delay > 0) {
-      const timerId = setTimeout(() => {
-        self.registration.showNotification(title, {
-          ...options,
-          // Ensure sound is requested for scheduled notifications as well
-          sound: options.sound || '/silent.mp3',
-          vibrate: [200, 100, 200],
-          actions: [
-            { action: 'snooze', title: 'Snooze (5 min)' },
-            { action: 'dismiss', title: 'Dismiss' }
-          ],
-          data: { id, originalTime: time, title, options } // Store original data for snooze
+      setTimeout(() => {
+        self.registration.showNotification(title, { 
+            ...options,
+            tag: String(id), // Use ID as tag
+            data: { id, originalTime: time, title, options },
+            actions: [
+                { action: 'snooze', title: 'Snooze 5 mins' },
+                { action: 'dismiss', title: 'Dismiss' }
+            ]
         });
-        scheduledNotifications.delete(id);
       }, delay);
-      scheduledNotifications.set(id, timerId);
     }
-  } else if (type === 'cancel-notification') {
-    const { id } = payload;
-    if (scheduledNotifications.has(id)) {
-      clearTimeout(scheduledNotifications.get(id));
-      scheduledNotifications.delete(id);
-    }
+  } else if (event.data.type === 'cancel-notification') {
+      // This is harder to implement with setTimeout, but we can prevent future ones
+      // For a real app, a more robust solution like IndexedDB would be needed.
   }
 });
 
-self.addEventListener('notificationclick', (event) => {
+self.addEventListener('notificationclick', event => {
   event.notification.close();
 
-  const notificationData = event.notification.data;
-
   if (event.action === 'snooze') {
-    const snoozeTime = Date.now() + 5 * 60 * 1000; // 5 minutes from now
+    const fiveMinutes = 5 * 60 * 1000;
+    const { title, options } = event.notification.data;
     
-    // Re-schedule the notification
-    const newTimerId = setTimeout(() => {
-      self.registration.showNotification(`Snoozed: ${notificationData.title}`, {
-        ...notificationData.options,
-        sound: notificationData.options.sound || '/silent.mp3',
-        vibrate: [200, 100, 200],
+    self.registration.showNotification(`Snoozed: ${title}`, {
+        ...options,
+        tag: event.notification.tag,
+        showTrigger: new self.TimestampTrigger(Date.now() + fiveMinutes),
+        data: event.notification.data,
         actions: [
-            { action: 'snooze', title: 'Snooze (5 min)' },
+            { action: 'snooze', title: 'Snooze 5 mins' },
             { action: 'dismiss', title: 'Dismiss' }
-        ],
-        data: notificationData // Pass the same data again
-      });
-      scheduledNotifications.delete(notificationData.id);
-    }, snoozeTime - Date.now());
-
-    scheduledNotifications.set(notificationData.id, newTimerId);
-
+        ]
+    });
   } else if (event.action === 'dismiss') {
     // Just close the notification, which is the default behavior.
-    // No further action needed.
   } else {
-    // Default action (if user just clicks the notification body)
-    // Focus or open the app window
+    // Default action (clicking the notification body)
     event.waitUntil(
-      clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-        if (clientList.length > 0) {
-          let client = clientList[0];
-          for (let i = 0; i < clientList.length; i++) {
-            if (clientList[i].focused) {
-              client = clientList[i];
-            }
+      clients.matchAll({ type: 'window' }).then(clientList => {
+        for (const client of clientList) {
+          if ('focus' in client) {
+            return client.focus();
           }
-          return client.focus();
         }
-        return clients.openWindow('/');
+        if (clients.openWindow) {
+          return clients.openWindow('/');
+        }
       })
     );
   }
