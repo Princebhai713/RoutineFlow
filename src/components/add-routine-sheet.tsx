@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -8,8 +9,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { useToast } from "@/hooks/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
+import type { Routine } from "@/lib/types";
 
 const routineSchema = z.object({
   attempt: z.string({ required_error: "Please select an attempt." }).min(1, "Please select an attempt."),
@@ -20,46 +21,53 @@ const routineSchema = z.object({
 });
 
 type RoutineFormValues = z.infer<typeof routineSchema>;
+type NewRoutineData = Omit<Routine, 'id'>;
 
 interface AddRoutineSheetProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  onAddRoutine: (data: RoutineFormValues) => void;
+  onAddRoutine: (data: NewRoutineData) => void;
+  routineToEdit: Routine | null;
 }
 
-export function AddRoutineSheet({ isOpen, onOpenChange, onAddRoutine }: AddRoutineSheetProps) {
-  const { toast } = useToast();
+export function AddRoutineSheet({ isOpen, onOpenChange, onAddRoutine, routineToEdit }: AddRoutineSheetProps) {
   const form = useForm<RoutineFormValues>({
     resolver: zodResolver(routineSchema),
     defaultValues: {
       attempt: "",
       time: "",
       work: "",
-      hours: "" as any,
+      hours: 0,
       completed: false,
     },
   });
 
+  useEffect(() => {
+    if (routineToEdit) {
+      form.reset(routineToEdit);
+    } else {
+      form.reset({
+        attempt: "",
+        time: "",
+        work: "",
+        hours: 0,
+        completed: false,
+      });
+    }
+  }, [routineToEdit, form, isOpen]);
+
   function onSubmit(data: RoutineFormValues) {
     onAddRoutine(data);
-    toast({
-      title: "Routine Added",
-      description: `Your routine for "${data.work}" has been saved.`,
-    });
-    form.reset();
     onOpenChange(false);
   }
 
   return (
-    <Sheet open={isOpen} onOpenChange={(open) => {
-      if (!open) form.reset();
-      onOpenChange(open);
-    }}>
+    <Sheet open={isOpen} onOpenChange={onOpenChange}>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>Add New Routine</SheetTitle>
+          <SheetTitle>{routineToEdit ? "Edit Routine" : "Add New Routine"}</SheetTitle>
           <SheetDescription>
-            Fill in the details of your routine. Click save when you're done.
+            {routineToEdit ? "Update the details of your routine." : "Fill in the details of your new routine."}
           </SheetDescription>
         </SheetHeader>
         <Form {...form}>
