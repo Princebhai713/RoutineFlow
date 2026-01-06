@@ -16,7 +16,7 @@ const routineSchema = z.object({
   attempt: z.string({ required_error: "Please select an attempt." }).min(1, "Please select an attempt."),
   time: z.string().min(1, { message: "Time is required." }),
   work: z.string().min(1, { message: "Work/Subject is required." }),
-  hours: z.coerce.number().min(0, { message: "Hours must be a positive number." }),
+  hours: z.coerce.number().min(0, { message: "Hours must be a positive number." }).default(0),
   completed: z.boolean().default(false),
 });
 
