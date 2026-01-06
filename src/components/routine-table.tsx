@@ -1,15 +1,16 @@
 "use client";
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { Checkbox } from "@/components/ui/checkbox";
 import type { Routine } from "@/lib/types";
 
 interface RoutineTableProps {
   routines: Routine[];
+  onToggleComplete: (id: string) => void;
 }
 
-export function RoutineTable({ routines }: RoutineTableProps) {
+export function RoutineTable({ routines, onToggleComplete }: RoutineTableProps) {
   if (routines.length === 0) {
     return (
       <div className="text-center py-24 border-2 border-dashed rounded-lg">
@@ -19,17 +20,7 @@ export function RoutineTable({ routines }: RoutineTableProps) {
     );
   }
 
-  const getStatusClass = (score: number) => {
-    if (score >= 8) return "bg-chart-2/10";
-    if (score >= 5) return "bg-chart-4/10";
-    return "bg-chart-1/10";
-  };
-  
-  const getDotClass = (score: number) => {
-    if (score >= 8) return "text-chart-2";
-    if (score >= 5) return "text-chart-4";
-    return "text-chart-1";
-  };
+  const totalHours = routines.reduce((sum, routine) => sum + routine.hours, 0);
 
   return (
     <Card>
@@ -45,23 +36,34 @@ export function RoutineTable({ routines }: RoutineTableProps) {
                 <TableHead>Attempt</TableHead>
                 <TableHead>Time</TableHead>
                 <TableHead>Work</TableHead>
-                <TableHead className="text-right">Score</TableHead>
+                <TableHead className="text-right">Hours</TableHead>
                 <TableHead className="text-center w-[100px]">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {routines.map((routine) => (
-                <TableRow key={routine.id} className={cn(getStatusClass(routine.score))}>
+                <TableRow key={routine.id}>
                   <TableCell>{routine.attempt}</TableCell>
                   <TableCell>{routine.time}</TableCell>
                   <TableCell className="font-medium">{routine.work}</TableCell>
-                  <TableCell className="text-right">{routine.score}</TableCell>
+                  <TableCell className="text-right">{routine.hours}</TableCell>
                   <TableCell className="text-center">
-                    <span className={cn("text-2xl font-bold", getDotClass(routine.score))}>•</span>
+                    <Checkbox
+                      checked={routine.completed}
+                      onCheckedChange={() => onToggleComplete(routine.id)}
+                      aria-label="Toggle completion status"
+                    />
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
+            <TableFooter>
+              <TableRow>
+                <TableCell colSpan={3} className="font-bold">Total Hours</TableCell>
+                <TableCell className="text-right font-bold">{totalHours.toFixed(2)}</TableCell>
+                <TableCell></TableCell>
+              </TableRow>
+            </TableFooter>
           </Table>
         </div>
       </CardContent>

@@ -3,5 +3,6 @@ export type Routine = {
   attempt: string;
   time: string;
   work: string;
-  score: number;
+  hours: number;
+  completed: boolean;
 };

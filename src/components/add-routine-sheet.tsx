@@ -9,12 +9,14 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useToast } from "@/hooks/use-toast";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const routineSchema = z.object({
   attempt: z.string({ required_error: "Please select an attempt." }).min(1, "Please select an attempt."),
   time: z.string().min(1, { message: "Time is required." }),
   work: z.string().min(1, { message: "Work/Subject is required." }),
-  score: z.coerce.number().min(0, { message: "Score must be at least 0." }).max(10, { message: "Score must be at most 10." }),
+  hours: z.coerce.number().min(0, { message: "Hours must be a positive number." }),
+  completed: z.boolean().default(false),
 });
 
 type RoutineFormValues = z.infer<typeof routineSchema>;
@@ -33,7 +35,8 @@ export function AddRoutineSheet({ isOpen, onOpenChange, onAddRoutine }: AddRouti
       attempt: "",
       time: "",
       work: "",
-      score: "" as any,
+      hours: "" as any,
+      completed: false,
     },
   });
 
@@ -111,14 +114,33 @@ export function AddRoutineSheet({ isOpen, onOpenChange, onAddRoutine }: AddRouti
             />
             <FormField
               control={form.control}
-              name="score"
+              name="hours"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Score (0-10)</FormLabel>
+                  <FormLabel>Hours</FormLabel>
                   <FormControl>
-                    <Input type="number" min="0" max="10" placeholder="e.g., 8" {...field} />
+                    <Input type="number" min="0" placeholder="e.g., 2" {...field} />
                   </FormControl>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="completed"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                   <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>
+                      Mark as completed
+                    </FormLabel>
+                  </div>
                 </FormItem>
               )}
             />

@@ -40,6 +40,10 @@ export default function Home() {
     };
     setRoutines((prevRoutines) => [...prevRoutines, newRoutine]);
   };
+  
+  const toggleRoutineCompletion = (routineId: string) => {
+    setRoutines(routines.map(r => r.id === routineId ? {...r, completed: !r.completed} : r));
+  };
 
   if (!isMounted) {
     return null;
@@ -49,7 +53,7 @@ export default function Home() {
     <div className="min-h-screen bg-background">
       <AppHeader routines={routines} />
       <main className="container py-8">
-        <RoutineTable routines={routines} />
+        <RoutineTable routines={routines} onToggleComplete={toggleRoutineCompletion} />
       </main>
       <Button
         className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg"
