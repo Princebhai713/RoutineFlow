@@ -14,6 +14,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFoo
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import type { Routine } from "@/lib/types";
+import { formatTime } from "@/lib/utils";
 
 interface RoutineTableProps {
   routines: Routine[];
@@ -57,7 +58,7 @@ export function RoutineTable({ routines, onToggleComplete, onDeleteRoutine, onEd
               {routines.map((routine) => (
                 <TableRow key={routine.id}>
                   <TableCell>{routine.attempt}</TableCell>
-                  <TableCell>{routine.time}</TableCell>
+                  <TableCell>{formatTime(routine.startTime)} - {formatTime(routine.endTime)}</TableCell>
                   <TableCell className="font-medium">{routine.work}</TableCell>
                   <TableCell className="text-right">{routine.hours}</TableCell>
                   <TableCell className="text-center">

@@ -1,7 +1,8 @@
 export type Routine = {
   id: string;
   attempt: string;
-  time: string;
+  startTime: string;
+  endTime: string;
   work: string;
   hours: number;
   completed: boolean;

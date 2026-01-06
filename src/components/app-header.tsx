@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { useNotifications } from '@/hooks/use-notifications';
 import { useToast } from '@/hooks/use-toast';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { parseTimeString, formatDistanceToNow } from '@/lib/utils';
+import { parseTimeString, formatDistanceToNow, formatTime } from '@/lib/utils';
 
 export function AppHeader({ routines }: { routines: Routine[] }) {
   const [currentDate, setCurrentDate] = useState('');
@@ -27,7 +27,7 @@ export function AppHeader({ routines }: { routines: Routine[] }) {
         .filter(r => !r.completed)
         .map(r => ({
           routine: r,
-          scheduledTime: parseTimeString(r.time)
+          scheduledTime: parseTimeString(r.startTime)
         }))
         .filter(r => r.scheduledTime > now)
         .sort((a, b) => a.scheduledTime.getTime() - b.scheduledTime.getTime());
@@ -99,7 +99,7 @@ export function AppHeader({ routines }: { routines: Routine[] }) {
                       </div>
                        <div className="grid grid-cols-3 items-center gap-4">
                         <span className="col-span-1 text-sm font-semibold">Time:</span>
-                        <span className="col-span-2 text-sm">{nextRoutine.routine.time}</span>
+                        <span className="col-span-2 text-sm">{formatTime(nextRoutine.routine.startTime)}</span>
                       </div>
                       <div className="grid grid-cols-3 items-center gap-4">
                         <span className="col-span-1 text-sm font-semibold">In:</span>

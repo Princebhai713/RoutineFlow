@@ -11,16 +11,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Checkbox } from "@/components/ui/checkbox";
 import type { Routine } from "@/lib/types";
+import { calculateHours } from "@/lib/utils";
+
 
 const routineSchema = z.object({
   attempt: z.string({ required_error: "Please select an attempt." }).min(1, "Please select an attempt."),
-  time: z.string().min(1, { message: "Time is required." }),
+  startTime: z.string().min(1, { message: "Start time is required." }),
+  endTime: z.string().min(1, { message: "End time is required." }),
   work: z.string().min(1, { message: "Work/Subject is required." }),
-  hours: z.coerce.number().min(0, { message: "Hours must be a positive number." }).default(0),
   completed: z.boolean().default(false),
+}).refine(data => data.endTime > data.startTime, {
+  message: "End time must be after start time.",
+  path: ["endTime"],
 });
 
-type RoutineFormValues = z.infer<typeof routineSchema>;
+type RoutineFormValues = Omit<z.infer<typeof routineSchema>, 'hours'>;
 type NewRoutineData = Omit<Routine, 'id' | 'notificationId'>;
 
 interface AddRoutineSheetProps {
@@ -35,9 +40,9 @@ export function AddRoutineSheet({ isOpen, onOpenChange, onAddRoutine, routineToE
     resolver: zodResolver(routineSchema),
     defaultValues: {
       attempt: "",
-      time: "",
+      startTime: "",
+      endTime: "",
       work: "",
-      hours: 0,
       completed: false,
     },
   });
@@ -48,16 +53,17 @@ export function AddRoutineSheet({ isOpen, onOpenChange, onAddRoutine, routineToE
     } else {
       form.reset({
         attempt: "",
-        time: "",
+        startTime: "",
+        endTime: "",
         work: "",
-        hours: 0,
         completed: false,
       });
     }
   }, [routineToEdit, form, isOpen]);
 
   function onSubmit(data: RoutineFormValues) {
-    onAddRoutine(data);
+    const hours = calculateHours(data.startTime, data.endTime);
+    onAddRoutine({ ...data, hours });
     onOpenChange(false);
   }
 
@@ -97,19 +103,34 @@ export function AddRoutineSheet({ isOpen, onOpenChange, onAddRoutine, routineToE
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="time"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Time</FormLabel>
-                  <FormControl>
-                    <Input type="time" placeholder="e.g., 8am - 10am" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="flex gap-4">
+              <FormField
+                control={form.control}
+                name="startTime"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel>Start Time</FormLabel>
+                    <FormControl>
+                      <Input type="time" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="endTime"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel>End Time</FormLabel>
+                    <FormControl>
+                      <Input type="time" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             <FormField
               control={form.control}
               name="work"
@@ -118,19 +139,6 @@ export function AddRoutineSheet({ isOpen, onOpenChange, onAddRoutine, routineToE
                   <FormLabel>Work / Subject</FormLabel>
                   <FormControl>
                     <Input placeholder="e.g., Study Physics" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="hours"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Hours</FormLabel>
-                  <FormControl>
-                    <Input type="number" min="0" placeholder="e.g., 2" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

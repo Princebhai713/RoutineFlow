@@ -49,3 +49,27 @@ export function parseTimeString(timeString: string): Date {
 export function formatDistanceToNow(date: Date): string {
   return formatDistanceToNowStrict(date, { addSuffix: true });
 }
+
+export function calculateHours(startTime: string, endTime: string): number {
+  if (!startTime || !endTime) return 0;
+  const start = parseTimeString(startTime);
+  const end = parseTimeString(endTime);
+
+  if (end <= start) {
+    // If end time is on the next day
+    end.setDate(end.getDate() + 1);
+  }
+
+  const diffMs = end.getTime() - start.getTime();
+  const diffHours = diffMs / (1000 * 60 * 60);
+  return parseFloat(diffHours.toFixed(2));
+}
+
+export function formatTime(timeString: string) {
+  if (!timeString) return "";
+  const [hours, minutes] = timeString.split(':');
+  const h = parseInt(hours, 10);
+  const ampm = h >= 12 ? 'pm' : 'am';
+  const formattedHour = h % 12 || 12; // convert 0 to 12
+  return `${formattedHour}:${minutes}${ampm}`;
+}

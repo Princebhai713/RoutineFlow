@@ -58,7 +58,7 @@ export default function Home() {
           if (r.notificationId) {
             cancelNotification(r.notificationId);
           }
-           const scheduleTime = parseTimeString(data.time);
+           const scheduleTime = parseTimeString(data.startTime);
           if (!data.completed && scheduleTime > new Date()) {
              notificationId = scheduleNotification(
               "Routine Reminder",
@@ -74,7 +74,7 @@ export default function Home() {
       toast({ title: "Routine Updated", description: `Your routine for "${data.work}" has been updated.` });
     } else {
       // Add new
-      const scheduleTime = parseTimeString(data.time);
+      const scheduleTime = parseTimeString(data.startTime);
       if (!data.completed && scheduleTime > new Date() && permission === 'granted') {
         notificationId = scheduleNotification(
           "Routine Reminder",
@@ -105,7 +105,7 @@ export default function Home() {
         }
         // If un-marking, re-schedule if time is in future
         else if (!updatedRoutine.completed) {
-          const scheduleTime = parseTimeString(r.time);
+          const scheduleTime = parseTimeString(r.startTime);
           if (scheduleTime > new Date()) {
             updatedRoutine.notificationId = scheduleNotification(
               "Routine Reminder",
@@ -216,5 +216,3 @@ export default function Home() {
     </div>
   );
 }
-
-    

@@ -2,6 +2,7 @@
 
 import { suggestOptimalSchedule, SmartScheduleInput } from '@/ai/flows/smart-schedule-suggestions';
 import type { Routine } from '@/lib/types';
+import { formatTime } from '@/lib/utils';
 
 export async function getSmartSuggestions(routines: Routine[]) {
   if (!routines || routines.length === 0) {
@@ -14,7 +15,7 @@ export async function getSmartSuggestions(routines: Routine[]) {
   // Let's create a synthetic score for the AI.
   const formattedRoutines: SmartScheduleInput = routines.map(r => ({
     attempt: r.attempt,
-    time: r.time,
+    time: `${formatTime(r.startTime)} - ${formatTime(r.endTime)}`,
     work: r.work,
     score: r.completed ? 10 : 2, // simple logic: completed is a high score, not completed is low
   }));
