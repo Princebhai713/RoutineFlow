@@ -88,7 +88,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen w-full bg-background overflow-x-hidden">
       <AppHeader routines={routines} />
       <main className="container py-8">
         <RoutineTable 
