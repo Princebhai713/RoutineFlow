@@ -37,15 +37,15 @@ export function AppHeader({ routines }: { routines: Routine[] }) {
     <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-sm">
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-6 md:gap-10">
-          <a href="/" className="flex items-center space-x-2">
+          <a href="/" className="flex items-center space-x-2 flex-shrink-0">
             <BrainCircuit className="h-6 w-6 text-primary" />
             <span className="inline-block font-bold text-lg">RoutineFlow</span>
           </a>
         </div>
-        <div className="flex items-center space-x-4">
-          <p className="hidden sm:block text-sm text-muted-foreground">{currentDate}</p>
+        <div className="flex items-center justify-end space-x-4">
+          <p className="hidden sm:block text-sm text-muted-foreground whitespace-nowrap">{currentDate}</p>
           {permission !== 'granted' && (
-            <Button onClick={handlePermissionRequest} variant="outline" size="sm">
+            <Button onClick={handlePermissionRequest} variant="outline" size="sm" className="flex-shrink-0">
               <Bell className="mr-2 h-4 w-4" />
               Enable Notifications
             </Button>
