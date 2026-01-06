@@ -35,14 +35,14 @@ export function AppHeader({ routines }: { routines: Routine[] }) {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-sm">
-      <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
-        <div className="flex gap-6 md:gap-10">
+      <div className="container flex h-16 items-center justify-between">
+        <div className="flex items-center gap-6 md:gap-10">
           <a href="/" className="flex items-center space-x-2">
             <BrainCircuit className="h-6 w-6 text-primary" />
             <span className="inline-block font-bold text-lg">RoutineFlow</span>
           </a>
         </div>
-        <div className="flex flex-1 items-center justify-end space-x-4">
+        <div className="flex items-center space-x-4">
           <p className="hidden sm:block text-sm text-muted-foreground">{currentDate}</p>
           {permission !== 'granted' && (
             <Button onClick={handlePermissionRequest} variant="outline" size="sm">
