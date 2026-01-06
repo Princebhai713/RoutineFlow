@@ -7,8 +7,9 @@ export const metadata: Metadata = {
   description: 'A smart daily routine planner to optimize your day.',
   manifest: '/manifest.json',
   icons: {
-    icon: '/favicon.ico',
-    apple: '/apple-icon.png',
+    icon: '/logo.svg',
+    shortcut: '/logo.svg',
+    apple: '/logo.svg',
   },
 };
 
