@@ -10,7 +10,11 @@ function postMessageToServiceWorker(message: any) {
 }
 
 // A simple way to generate unique IDs for notifications
-const generateId = () => Math.floor(Math.random() * 1000000);
+let notificationIdCounter = 0;
+const generateId = () => {
+  notificationIdCounter += 1;
+  return notificationIdCounter;
+};
 
 
 export function useNotifications() {
@@ -51,6 +55,8 @@ export function useNotifications() {
         options: {
           ...options,
           icon: '/logo.png',
+          sound: '/silent.mp3', // Request sound playback
+          vibrate: [200, 100, 200],
         },
       }
     });
@@ -78,6 +84,8 @@ export function useNotifications() {
             options: {
                 ...options,
                 icon: '/logo.png',
+                sound: '/silent.mp3', // Request sound playback
+                vibrate: [200, 100, 200],
             },
             time,
         },
