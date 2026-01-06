@@ -19,7 +19,7 @@ export default function Home() {
   const [isMounted, setIsMounted] = useState(false);
   const [editingRoutine, setEditingRoutine] = useState<Routine | null>(null);
   const { toast } = useToast();
-  const { scheduleNotification, cancelNotification, permission, showNotification } = useNotifications();
+  const { scheduleNotification, cancelNotification, permission, showNotification, requestPermission } = useNotifications();
 
   useEffect(() => {
     setIsMounted(true);
@@ -141,12 +141,18 @@ export default function Home() {
     }
   };
 
-  const sendDemoNotification = () => {
-    if (permission !== 'granted') {
+  const sendDemoNotification = async () => {
+    let currentPermission = permission;
+    if (currentPermission === 'default') {
+      const granted = await requestPermission();
+      currentPermission = granted ? 'granted' : 'denied';
+    }
+
+    if (currentPermission !== 'granted') {
       toast({
         variant: "destructive",
-        title: "Notifications not enabled",
-        description: "Please enable notifications to send a demo.",
+        title: "Notifications Blocked",
+        description: "Click the lock icon in the address bar to enable notifications.",
       });
       return;
     }

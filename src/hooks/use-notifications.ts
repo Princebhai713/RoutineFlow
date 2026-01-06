@@ -17,6 +17,12 @@ export function useNotifications() {
       console.error("This browser does not support desktop notification");
       return false;
     }
+    
+    // If permission is already granted or denied, don't ask again
+    if (Notification.permission !== 'default') {
+      setPermission(Notification.permission);
+      return Notification.permission === 'granted';
+    }
 
     const newPermission = await Notification.requestPermission();
     setPermission(newPermission);
@@ -39,9 +45,9 @@ export function useNotifications() {
     }
   }, []);
 
-  const scheduleNotification = useCallback((title: string, scheduleTime: Date, options?: NotificationOptions) => {
+  const scheduleNotification = useCallback((title: string, scheduleTime: Date, options?: NotificationOptions): number | undefined => {
     if (permission !== 'granted') {
-      return;
+      return undefined;
     }
 
     const now = new Date().getTime();
@@ -49,7 +55,7 @@ export function useNotifications() {
 
     if (timeUntilNotification < 0) {
       console.log("Cannot schedule notification for a past time.");
-      return;
+      return undefined;
     }
 
     const timeoutId = window.setTimeout(() => {
