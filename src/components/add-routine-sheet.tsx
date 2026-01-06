@@ -33,7 +33,7 @@ export function AddRoutineSheet({ isOpen, onOpenChange, onAddRoutine }: AddRouti
       attempt: "",
       time: "",
       work: "",
-      score: undefined,
+      score: "" as any,
     },
   });
 
