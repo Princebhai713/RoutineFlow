@@ -19,7 +19,7 @@ export default function Home() {
   const [isMounted, setIsMounted] = useState(false);
   const [editingRoutine, setEditingRoutine] = useState<Routine | null>(null);
   const { toast } = useToast();
-  const { showNotification, scheduleNotification, cancelNotification, permission } = useNotifications();
+  const { scheduleNotification, cancelNotification, permission } = useNotifications();
 
   useEffect(() => {
     setIsMounted(true);
@@ -35,41 +35,24 @@ export default function Home() {
 
   useEffect(() => {
     if (isMounted) {
-      localStorage.setItem("routines", JSON.stringify(routines.map(r => ({ ...r, notificationId: undefined }))));
-
-      // Re-schedule notifications on load if permission is granted
-      if (permission === 'granted') {
-        const now = new Date();
-        routines.forEach(routine => {
-          if (!routine.completed) {
-            const scheduleTime = parseTimeString(routine.time);
-            if (scheduleTime > now) {
-                // This is a simplified re-scheduling. For robustness, we'd need to store timeoutIds differently.
-                // For now, we just show a welcome back notification instead of re-scheduling all.
-            }
-          }
-        });
-      }
+      localStorage.setItem("routines", JSON.stringify(routines));
     }
-  }, [routines, isMounted, permission]);
-  
+  }, [routines, isMounted]);
 
   const handleAddOrUpdateRoutine = (data: NewRoutineData) => {
-    const scheduleTime = parseTimeString(data.time);
     let notificationId: number | undefined;
 
     if (editingRoutine) {
       // Update
       const updatedRoutines = routines.map(r => {
         if (r.id === editingRoutine.id) {
-          // Cancel previous notification if it existed
+           // Cancel previous notification if it existed
           if (r.notificationId) {
             cancelNotification(r.notificationId);
           }
-          
-          // Schedule new notification
+           const scheduleTime = parseTimeString(data.time);
           if (!data.completed && scheduleTime > new Date()) {
-            notificationId = scheduleNotification(
+             notificationId = scheduleNotification(
               "Routine Reminder",
               scheduleTime,
               { body: `It's time for: "${data.work}"` }
@@ -83,7 +66,8 @@ export default function Home() {
       toast({ title: "Routine Updated", description: `Your routine for "${data.work}" has been updated.` });
     } else {
       // Add new
-       if (!data.completed && scheduleTime > new Date() && permission === 'granted') {
+      const scheduleTime = parseTimeString(data.time);
+      if (!data.completed && scheduleTime > new Date() && permission === 'granted') {
         notificationId = scheduleNotification(
           "Routine Reminder",
           scheduleTime,
@@ -98,10 +82,6 @@ export default function Home() {
       };
       setRoutines((prevRoutines) => [...prevRoutines, newRoutine]);
       toast({ title: "Routine Added", description: `Your routine for "${data.work}" has been saved.` });
-      
-      if(permission === 'granted'){
-        showNotification("Routine Scheduled!", { body: `You'll be reminded for "${data.work}" at the set time.` });
-      }
     }
     setEditingRoutine(null);
   };
@@ -169,12 +149,14 @@ export default function Home() {
     <div className="min-h-screen w-full bg-background">
       <AppHeader routines={routines} />
       <main className="p-4 sm:p-6 lg:p-8">
-        <RoutineTable 
-          routines={routines} 
-          onToggleComplete={toggleRoutineCompletion}
-          onDeleteRoutine={deleteRoutine}
-          onEditRoutine={handleEdit}
-        />
+        <div className="max-w-7xl mx-auto">
+          <RoutineTable 
+            routines={routines} 
+            onToggleComplete={toggleRoutineCompletion}
+            onDeleteRoutine={deleteRoutine}
+            onEditRoutine={handleEdit}
+          />
+        </div>
       </main>
       <Button
         className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg z-50"
