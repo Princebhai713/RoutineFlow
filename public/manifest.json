@@ -4,7 +4,7 @@
   "description": "A smart daily routine planner to optimize your day.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
+  "background_color": "#EBF4FF",
   "theme_color": "#3B82F6",
   "icons": [
     {

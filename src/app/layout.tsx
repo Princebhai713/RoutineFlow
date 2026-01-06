@@ -6,6 +6,10 @@ export const metadata: Metadata = {
   title: 'RoutineFlow',
   description: 'A smart daily routine planner to optimize your day.',
   manifest: '/manifest.json',
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/apple-icon.png',
+  },
 };
 
 export default function RootLayout({
