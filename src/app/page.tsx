@@ -88,9 +88,9 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-background overflow-x-hidden">
+    <div className="min-h-screen w-full bg-background">
       <AppHeader routines={routines} />
-      <main className="container py-8">
+      <main className="p-4 sm:p-6 lg:p-8">
         <RoutineTable 
           routines={routines} 
           onToggleComplete={toggleRoutineCompletion}
@@ -99,7 +99,7 @@ export default function Home() {
         />
       </main>
       <Button
-        className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg"
+        className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg z-50"
         size="icon"
         onClick={handleAddNew}
         aria-label="Add new routine"
