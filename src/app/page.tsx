@@ -142,20 +142,19 @@ export default function Home() {
   };
 
   const sendDemoNotification = async () => {
-    let currentPermission = permission;
-    if (currentPermission === 'default') {
-      const granted = await requestPermission();
-      currentPermission = granted ? 'granted' : 'denied';
-    }
+    // We don't use the state `permission` here because it might be stale.
+    // `requestPermission` will ask if needed and return the latest status.
+    const isGranted = await requestPermission();
 
-    if (currentPermission !== 'granted') {
+    if (!isGranted) {
       toast({
         variant: "destructive",
         title: "Notifications Blocked",
-        description: "Click the lock icon in the address bar to enable notifications.",
+        description: "Please enable notifications in your browser settings to receive reminders.",
       });
       return;
     }
+    
     showNotification("Demo Routine: Sleep", {
       body: "Time: 12:00, Hours: 10, Attempt: First",
     });
@@ -209,3 +208,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
