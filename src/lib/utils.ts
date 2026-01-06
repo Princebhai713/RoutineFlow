@@ -10,6 +10,10 @@ export function cn(...inputs: ClassValue[]) {
 export function parseTimeString(timeString: string): Date {
   const now = new Date();
   
+  if (!timeString) {
+    return now;
+  }
+
   // Handles "HH:mm" (24-hour) format from <input type="time">
   if (timeString.includes(':')) {
     const [hours, minutes] = timeString.split(':').map(Number);
