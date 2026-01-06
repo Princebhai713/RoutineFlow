@@ -8,6 +8,7 @@ import { RoutineTable } from "@/components/routine-table";
 import { Button } from "@/components/ui/button";
 import type { Routine } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
+import { useNotifications } from "@/hooks/use-notifications";
 
 type NewRoutineData = Omit<Routine, 'id'>;
 
@@ -17,6 +18,7 @@ export default function Home() {
   const [isMounted, setIsMounted] = useState(false);
   const [editingRoutine, setEditingRoutine] = useState<Routine | null>(null);
   const { toast } = useToast();
+  const { showNotification } = useNotifications();
 
   useEffect(() => {
     setIsMounted(true);
@@ -47,6 +49,7 @@ export default function Home() {
       };
       setRoutines((prevRoutines) => [...prevRoutines, newRoutine]);
       toast({ title: "Routine Added", description: `Your routine for "${data.work}" has been saved.` });
+      showNotification("Routine Added!", { body: `Don't forget: "${data.work}"` });
     }
     setEditingRoutine(null);
   };
