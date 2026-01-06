@@ -27,7 +27,7 @@ export function useNotifications() {
     if (!('Notification' in window)) {
       return;
     }
-    if (permission === 'granted') {
+    if (Notification.permission === 'granted') {
       const notification = new Notification(title, {
         ...options,
         icon: '/logo.png', // It's good practice to have an icon
@@ -37,7 +37,32 @@ export function useNotifications() {
         window.focus();
       };
     }
-  }, [permission]);
+  }, []);
 
-  return { permission, requestPermission, showNotification };
+  const scheduleNotification = useCallback((title: string, scheduleTime: Date, options?: NotificationOptions) => {
+    if (permission !== 'granted') {
+      return;
+    }
+
+    const now = new Date().getTime();
+    const timeUntilNotification = scheduleTime.getTime() - now;
+
+    if (timeUntilNotification < 0) {
+      console.log("Cannot schedule notification for a past time.");
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      showNotification(title, options);
+    }, timeUntilNotification);
+
+    return timeoutId;
+  }, [permission, showNotification]);
+
+  const cancelNotification = useCallback((timeoutId: number) => {
+    window.clearTimeout(timeoutId);
+  }, []);
+
+
+  return { permission, requestPermission, showNotification, scheduleNotification, cancelNotification };
 }

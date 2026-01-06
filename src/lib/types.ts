@@ -5,4 +5,5 @@ export type Routine = {
   work: string;
   hours: number;
   completed: boolean;
+  notificationId?: number;
 };

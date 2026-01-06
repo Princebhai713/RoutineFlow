@@ -21,7 +21,7 @@ const routineSchema = z.object({
 });
 
 type RoutineFormValues = z.infer<typeof routineSchema>;
-type NewRoutineData = Omit<Routine, 'id'>;
+type NewRoutineData = Omit<Routine, 'id' | 'notificationId'>;
 
 interface AddRoutineSheetProps {
   isOpen: boolean;
@@ -101,7 +101,7 @@ export function AddRoutineSheet({ isOpen, onOpenChange, onAddRoutine, routineToE
                 <FormItem>
                   <FormLabel>Time</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., 8am - 10am" {...field} />
+                    <Input type="time" placeholder="e.g., 8am - 10am" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
